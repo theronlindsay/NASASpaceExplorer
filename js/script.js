@@ -64,6 +64,68 @@ function displayRandomSpaceFact() {
 // Display a random space fact when the page loads
 displayRandomSpaceFact();
 
+// Disable dark theme extensions and set iOS status bar color
+function setupThemeAndDisplay() {
+  // Disable dark mode extensions by setting color scheme to light
+  document.documentElement.style.colorScheme = 'light only';
+  
+  // Add meta tag for iOS status bar color
+  const existingMeta = document.querySelector('meta[name="theme-color"]');
+  if (existingMeta) {
+    existingMeta.setAttribute('content', '#333333');
+  } else {
+    const metaTheme = document.createElement('meta');
+    metaTheme.name = 'theme-color';
+    metaTheme.content = '#333333';
+    document.head.appendChild(metaTheme);
+  }
+  
+  // Add meta tag for iOS status bar style
+  const existingStatusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if (existingStatusMeta) {
+    existingStatusMeta.setAttribute('content', 'default');
+  } else {
+    const metaStatus = document.createElement('meta');
+    metaStatus.name = 'apple-mobile-web-app-status-bar-style';
+    metaStatus.content = 'default';
+    document.head.appendChild(metaStatus);
+  }
+  
+  // Add viewport meta with viewport-fit for iOS notch handling
+  const existingViewport = document.querySelector('meta[name="viewport"]');
+  if (existingViewport) {
+    const currentContent = existingViewport.getAttribute('content');
+    if (!currentContent.includes('viewport-fit')) {
+      existingViewport.setAttribute('content', currentContent + ', viewport-fit=cover');
+    }
+  }
+  
+  // Add CSS for iOS safe areas
+  const style = document.createElement('style');
+  style.textContent = `
+    @supports (padding: max(0px)) {
+      body {
+        padding-top: max(20px, env(safe-area-inset-top));
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        background: #333 !important;
+      }
+      
+      body::before {
+        top: max(10px, calc(env(safe-area-inset-top) + 10px));
+        left: max(10px, calc(env(safe-area-inset-left) + 10px));
+        right: max(10px, calc(env(safe-area-inset-right) + 10px));
+        bottom: max(10px, calc(env(safe-area-inset-bottom) + 10px));
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// Call the setup function
+setupThemeAndDisplay();
+
 // Function to extract YouTube video ID from URL
 function getYouTubeVideoId(url) {
   const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
@@ -253,22 +315,33 @@ function showModal(item) {
   // Add touch support for swiping away modal on mobile
   let startY = 0;
   let startX = 0;
+  let startedFromTop = false;
   
   // Track touch start position
   modal.addEventListener('touchstart', (e) => {
     startY = e.touches[0].clientY;
     startX = e.touches[0].clientX;
+    
+    // Check if the touch started from the top 20% of the modal
+    const modalRect = modalContent.getBoundingClientRect();
+    const touchRelativeY = startY - modalRect.top;
+    const modalHeight = modalRect.height;
+    startedFromTop = touchRelativeY <= modalHeight * 0.2;
   });
   
   // Handle touch end - check for swipe gesture
   modal.addEventListener('touchend', (e) => {
+    // Only process swipe if it started from the top portion
+    if (!startedFromTop) return;
+    
     const endY = e.changedTouches[0].clientY;
     const endX = e.changedTouches[0].clientX;
     const deltaY = startY - endY;
-    const deltaX = startX - endX;
+    const deltaX = Math.abs(startX - endX);
     
-    // Check for swipe up, down, left, or right (minimum 50px movement)
-    if (Math.abs(deltaY) > 50 || Math.abs(deltaX) > 50) {
+    // Check for downward swipe with less horizontal movement
+    // Increased minimum movement to 100px and ensure it's primarily vertical
+    if (deltaY < -100 && deltaX < 50) {
       closeModal();
     }
   });
