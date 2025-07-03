@@ -119,6 +119,71 @@ function setupThemeAndDisplay() {
         bottom: max(10px, calc(env(safe-area-inset-bottom) + 10px));
       }
     }
+    
+    /* iOS Safari date picker styling */
+    input[type="date"] {
+      -webkit-appearance: none !important;
+      appearance: none !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #e5e5e5 !important;
+      border-radius: 8px !important;
+      padding: 12px 16px !important;
+      font-family: Helvetica, Arial, sans-serif !important;
+      font-size: 16px !important;
+      font-weight: 500 !important;
+      line-height: 1.4 !important;
+      width: 100% !important;
+      transition: all 0.2s ease !important;
+      position: relative !important;
+    }
+    
+    input[type="date"]:focus {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+      outline: none !important;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit {
+      color: #e5e5e5 !important;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+      color: #e5e5e5 !important;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit-text {
+      color: #e5e5e5 !important;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit-month-field {
+      color: #e5e5e5 !important;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit-day-field {
+      color: #e5e5e5 !important;
+    }
+    
+    input[type="date"]::-webkit-datetime-edit-year-field {
+      color: #e5e5e5 !important;
+    }
+    
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      background: transparent !important;
+      color: #e5e5e5 !important;
+      opacity: 0.8 !important;
+      cursor: pointer !important;
+      filter: invert(1) !important;
+    }
+    
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1 !important;
+    }
+    
+    /* Force light theme for date picker popup on iOS */
+    input[type="date"]::-webkit-date-and-time-value {
+      color: #e5e5e5 !important;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -316,6 +381,7 @@ function showModal(item) {
   let startY = 0;
   let startX = 0;
   let startedFromTop = false;
+  let startedFromLeftEdge = false;
   
   // Track touch start position
   modal.addEventListener('touchstart', (e) => {
@@ -327,21 +393,29 @@ function showModal(item) {
     const touchRelativeY = startY - modalRect.top;
     const modalHeight = modalRect.height;
     startedFromTop = touchRelativeY <= modalHeight * 0.2;
+    
+    // Check if the touch started from the left edge of the screen (within 30px)
+    startedFromLeftEdge = startX <= 30;
   });
   
   // Handle touch end - check for swipe gesture
   modal.addEventListener('touchend', (e) => {
-    // Only process swipe if it started from the top portion
-    if (!startedFromTop) return;
-    
     const endY = e.changedTouches[0].clientY;
     const endX = e.changedTouches[0].clientX;
     const deltaY = startY - endY;
-    const deltaX = Math.abs(startX - endX);
+    const deltaX = endX - startX; // Positive for right swipe, negative for left
+    const absDeltaX = Math.abs(deltaX);
+    const absDeltaY = Math.abs(deltaY);
     
-    // Check for downward swipe with less horizontal movement
-    // Increased minimum movement to 100px and ensure it's primarily vertical
-    if (deltaY < -100 && deltaX < 50) {
+    // Check for downward swipe from top (existing functionality)
+    if (startedFromTop && deltaY < -100 && absDeltaX < 50) {
+      closeModal();
+      return;
+    }
+    
+    // Check for right swipe from left edge
+    // Must start from left edge, swipe right at least 100px, and be primarily horizontal
+    if (startedFromLeftEdge && deltaX > 100 && absDeltaY < 50) {
       closeModal();
     }
   });
