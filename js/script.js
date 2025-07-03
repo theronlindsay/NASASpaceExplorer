@@ -184,6 +184,61 @@ function setupThemeAndDisplay() {
     input[type="date"]::-webkit-date-and-time-value {
       color: #e5e5e5 !important;
     }
+    
+    /* Dark theme scrollbars for all browsers */
+    /* Firefox */
+    * {
+      scrollbar-width: thin !important;
+      scrollbar-color: #555 #2a2a2a !important;
+    }
+    
+    /* WebKit browsers (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+      width: 8px !important;
+      height: 8px !important;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #2a2a2a !important;
+      border-radius: 4px !important;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #555 !important;
+      border-radius: 4px !important;
+      border: 1px solid #333 !important;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #666 !important;
+    }
+    
+    ::-webkit-scrollbar-thumb:active {
+      background: #777 !important;
+    }
+    
+    /* Corner where scrollbars meet */
+    ::-webkit-scrollbar-corner {
+      background: #2a2a2a !important;
+    }
+    
+    /* Modal specific scrollbars */
+    .modal-content ::-webkit-scrollbar {
+      width: 6px !important;
+    }
+    
+    .modal-content ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3) !important;
+      border: none !important;
+    }
+    
+    .modal-content ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4) !important;
+    }
+    
+    .modal-content ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -201,13 +256,8 @@ function getYouTubeVideoId(url) {
 // Function to fetch space images from NASA API
 async function fetchSpaceImages(startDate, endDate) {
   try {
-    // Show loading message
-    gallery.innerHTML = `
-      <div class="placeholder">
-        <div class="placeholder-icon">🚀</div>
-        <p>Loading space images...</p>
-      </div>
-    `;
+    // Show loading indicator with progress
+    showLoadingProgress();
 
     // Display a random space fact
     displayRandomSpaceFact();
@@ -226,8 +276,8 @@ async function fetchSpaceImages(startDate, endDate) {
     // Convert response to JSON
     const images = await response.json();
     
-    // Display the images in our gallery
-    displayImages(images);
+    // Display the images in our gallery with progress tracking
+    await displayImagesWithProgress(images);
     console.log('Fetched space images:', images);
     
   } catch (error) {
@@ -239,7 +289,265 @@ async function fetchSpaceImages(startDate, endDate) {
         <p>Sorry, we couldn't load the space images. Please try again.</p>
       </div>
     `;
+    
+    // Remove loading progress styles if they exist
+    const loadingStyles = document.getElementById('loadingProgressStyles');
+    if (loadingStyles) {
+      loadingStyles.remove();
+    }
   }
+}
+
+// Function to show loading progress indicator
+function showLoadingProgress() {
+  gallery.innerHTML = `
+    <div class="loading-container">
+      <div class="loading-content">
+        <div class="loading-icon">🚀</div>
+        <h3>Loading Space Images...</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-text" id="progressText">Preparing to fetch images...</p>
+      </div>
+    </div>
+  `;
+  
+  // Add loading progress styles
+  if (!document.getElementById('loadingProgressStyles')) {
+    const style = document.createElement('style');
+    style.id = 'loadingProgressStyles';
+    style.textContent = `
+      .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        padding: 40px 20px;
+      }
+      
+      .loading-content {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 40px 30px;
+        backdrop-filter: blur(10px);
+        max-width: 400px;
+        width: 100%;
+      }
+      
+      .loading-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        animation: rocket-pulse 2s ease-in-out infinite;
+      }
+      
+      @keyframes rocket-pulse {
+        0%, 100% { transform: scale(1) rotate(0deg); }
+        50% { transform: scale(1.1) rotate(5deg); }
+      }
+      
+      .loading-content h3 {
+        color: #e5e5e5;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0 0 20px 0;
+      }
+      
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 20px 0;
+        position: relative;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #105bd8, #4a90e2);
+        border-radius: 4px;
+        width: 0%;
+        transition: width 0.3s ease;
+        position: relative;
+      }
+      
+      .progress-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: progress-shimmer 1.5s ease-in-out infinite;
+      }
+      
+      @keyframes progress-shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+      
+      .progress-text {
+        color: #b0b0b0;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 0.9rem;
+        margin: 0;
+        font-weight: 400;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+// Function to update loading progress
+function updateLoadingProgress(current, total, message) {
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  
+  if (progressFill && progressText) {
+    const percentage = Math.round((current / total) * 100);
+    progressFill.style.width = `${percentage}%`;
+    progressText.textContent = message;
+  }
+}
+
+// Function to display images with progress tracking
+async function displayImagesWithProgress(images) {
+  // Update progress for API fetch completion
+  updateLoadingProgress(1, 3, 'Images fetched successfully! Preparing gallery...');
+  
+  // Clear the gallery
+  gallery.innerHTML = '';
+  
+  // If no images found, show a message
+  if (!images || images.length === 0) {
+    gallery.innerHTML = `
+      <div class="placeholder">
+        <div class="placeholder-icon">🌌</div>
+        <p>No images found for this date range.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Update progress for starting image processing
+  updateLoadingProgress(2, 3, 'Building image gallery...');
+  
+  // Don't create a temporary container, add cards directly to gallery
+  // This ensures the existing CSS grid layout works properly
+  
+  // Track loaded images for final progress
+  let imagesLoaded = 0;
+  const totalImages = images.length;
+  
+  // Create HTML for each image
+  images.forEach((item, index) => {
+    // Create a container for each space image
+    const imageCard = document.createElement('div');
+    imageCard.className = 'image-card';
+    imageCard.style.opacity = '0';
+    imageCard.style.transform = 'translateY(20px)';
+    
+    // Build the HTML content for this image
+    let imageHtml = '';
+    
+    // Check if this is an image or video
+    if (item.media_type === 'image') {
+      imageHtml = `<img src="${item.url}" alt="${item.title}" loading="lazy">`;
+    } else if (item.media_type === 'video') {
+      // Check if it's a YouTube video and embed it
+      const youtubeId = getYouTubeVideoId(item.url);
+      if (youtubeId) {
+        imageHtml = `
+          <div class="video-embed">
+            <iframe 
+              src="https://www.youtube.com/embed/${youtubeId}" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen
+              title="${item.title}">
+            </iframe>
+          </div>
+        `;
+      } else {
+        // Fallback for non-YouTube videos
+        imageHtml = `
+          <div class="video-placeholder">
+            <div class="video-icon">🎥</div>
+            <p><strong>Video Content</strong></p>
+            <a href="${item.url}" target="_blank" class="video-link">Watch Video</a>
+          </div>
+        `;
+      }
+    }
+    
+    // Set the complete HTML for this image card
+    imageCard.innerHTML = `
+      <div class="image-container">
+        ${imageHtml}
+      </div>
+      <div class="card-info">
+        <h3 class="card-title">${item.title}</h3>
+        <p class="card-date">${item.date}</p>
+      </div>
+    `;
+    
+    // Add click event to the entire card to show modal
+    imageCard.addEventListener('click', () => {
+      showModal(item);
+    });
+    
+    // Add this image card directly to the gallery
+    gallery.appendChild(imageCard);
+    
+    // Handle animation for different media types
+    if (item.media_type === 'image') {
+      const img = imageCard.querySelector('img');
+      let hasAnimated = false;
+      
+      const animateCard = () => {
+        if (!hasAnimated) {
+          hasAnimated = true;
+          setTimeout(() => {
+            imageCard.style.transition = 'all 0.5s ease';
+            imageCard.style.opacity = '1';
+            imageCard.style.transform = 'translateY(0)';
+          }, index * 100); // Stagger animation
+        }
+      };
+      
+      // Check if image is already loaded (cached)
+      if (img.complete && img.naturalHeight !== 0) {
+        animateCard();
+      } else {
+        // Set up load event for images that aren't cached
+        img.onload = animateCard;
+        img.onerror = animateCard; // Show card even if image fails to load
+      }
+    } else {
+      // For videos, immediately show them (no loading required)
+      setTimeout(() => {
+        imageCard.style.transition = 'all 0.5s ease';
+        imageCard.style.opacity = '1';
+        imageCard.style.transform = 'translateY(0)';
+      }, index * 100);
+    }
+  });
+  
+  // Update progress for final step
+  updateLoadingProgress(3, 3, 'Gallery ready! Loading images...');
+  
+  // Remove loading progress styles after a delay
+  setTimeout(() => {
+    const loadingStyles = document.getElementById('loadingProgressStyles');
+    if (loadingStyles) {
+      loadingStyles.remove();
+    }
+  }, 1000);
 }
 
 // Function to display images in the gallery
@@ -331,7 +639,18 @@ function showModal(item) {
         <div class="modal-body">
           <div class="modal-image">
             ${item.media_type === 'image' 
-              ? `<img src="${item.hdurl || item.url}" alt="${item.title}" loading="lazy">`
+              ? `<div class="modal-image-container">
+                   <div class="modal-image-loading" id="modalImageLoading">
+                     <div class="modal-loading-content">
+                       <div class="modal-loading-icon">🖼️</div>
+                       <p>Loading high-resolution image...</p>
+                       <div class="modal-progress-bar">
+                         <div class="modal-progress-fill" id="modalProgressFill"></div>
+                       </div>
+                     </div>
+                   </div>
+                   <img src="${item.hdurl || item.url}" alt="${item.title}" loading="lazy" id="modalImage" style="display: none;">
+                 </div>`
               : item.media_type === 'video' && getYouTubeVideoId(item.url)
               ? `<div class="video-container">
                    <iframe src="https://www.youtube.com/embed/${getYouTubeVideoId(item.url)}" 
@@ -359,10 +678,221 @@ function showModal(item) {
   // Add modal to the page
   document.body.insertAdjacentHTML('beforeend', modalHtml);
   
+  // Add modal image loading styles
+  if (!document.getElementById('modalLoadingStyles')) {
+    const style = document.createElement('style');
+    style.id = 'modalLoadingStyles';
+    style.textContent = `
+      .modal-image-container {
+        position: relative;
+        width: 100%;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      
+      .modal-image-loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        z-index: 2;
+        transition: opacity 0.3s ease;
+      }
+      
+      .modal-loading-content {
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        backdrop-filter: blur(15px);
+        max-width: 300px;
+        width: 90%;
+      }
+      
+      .modal-loading-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        animation: modal-image-pulse 1.5s ease-in-out infinite;
+      }
+      
+      @keyframes modal-image-pulse {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 1; }
+      }
+      
+      .modal-loading-content p {
+        color: #e5e5e5;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 1rem;
+        font-weight: 500;
+        margin: 0 0 15px 0;
+      }
+      
+      .modal-progress-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        position: relative;
+      }
+      
+      .modal-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #105bd8, #4a90e2);
+        border-radius: 3px;
+        width: 0%;
+        transition: width 0.2s ease;
+        position: relative;
+      }
+      
+      .modal-progress-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        animation: modal-progress-shimmer 1.2s ease-in-out infinite;
+      }
+      
+      @keyframes modal-progress-shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+      
+      .modal-image-container img {
+        max-width: 100%;
+        max-height: 70vh;
+        object-fit: contain;
+        border-radius: 8px;
+        transition: opacity 0.5s ease;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
   // Get modal elements
   const modal = document.getElementById('imageModal');
   const closeBtn = modal.querySelector('.close-modal');
   const modalContent = modal.querySelector('.modal-content');
+  
+  // Handle image loading for modal images
+  const modalImage = document.getElementById('modalImage');
+  const modalImageLoading = document.getElementById('modalImageLoading');
+  const modalProgressFill = document.getElementById('modalProgressFill');
+  
+  if (modalImage && modalImageLoading && modalProgressFill) {
+    let progress = 0;
+    let progressInterval;
+    let hasLoaded = false;
+    let progressCompleted = false;
+    
+    // Simulate progress during image loading - complete independently
+    const startProgress = () => {
+      progressInterval = setInterval(() => {
+        if (progress < 100) {
+          // Slow down as we approach 100%
+          const increment = progress > 90 ? Math.random() * 2 + 1 : Math.random() * 8 + 3;
+          progress += increment;
+          progress = Math.min(progress, 100);
+          modalProgressFill.style.width = `${progress}%`;
+          
+          // Mark progress as completed when we reach 100%
+          if (progress >= 100 && !progressCompleted) {
+            progressCompleted = true;
+            clearInterval(progressInterval);
+            
+            // If image is already loaded or we've waited enough, complete immediately
+            if (hasLoaded || modalImage.complete) {
+              setTimeout(completeLoading, 200);
+            } else {
+              // Wait a bit more for image, but not too long
+              setTimeout(() => {
+                if (!hasLoaded) {
+                  completeLoading();
+                }
+              }, 1500);
+            }
+          }
+        }
+      }, 120);
+    };
+    
+    // Function to complete loading animation
+    const completeLoading = () => {
+      if (hasLoaded) return;
+      hasLoaded = true;
+      
+      clearInterval(progressInterval);
+      modalProgressFill.style.width = '100%';
+      
+      setTimeout(() => {
+        modalImageLoading.style.opacity = '0';
+        modalImage.style.display = 'block';
+        modalImage.style.opacity = '1';
+        
+        setTimeout(() => {
+          if (modalImageLoading) {
+            modalImageLoading.style.display = 'none';
+          }
+        }, 300);
+      }, 100);
+    };
+    
+    // Check if image is already loaded (cached)
+    if (modalImage.complete && modalImage.naturalHeight !== 0) {
+      // For cached images, simulate quick loading
+      const quickProgress = setInterval(() => {
+        progress += 15;
+        modalProgressFill.style.width = `${Math.min(progress, 100)}%`;
+        if (progress >= 100) {
+          clearInterval(quickProgress);
+          setTimeout(completeLoading, 300);
+        }
+      }, 50);
+    } else {
+      // Handle image load success - speed up completion if needed
+      modalImage.onload = () => {
+        if (progressCompleted && !hasLoaded) {
+          completeLoading();
+        }
+      };
+      
+      // Handle image load error
+      modalImage.onerror = () => {
+        clearInterval(progressInterval);
+        modalImageLoading.innerHTML = `
+          <div class="modal-loading-content">
+            <div class="modal-loading-icon">❌</div>
+            <p>Failed to load high-resolution image</p>
+            <p style="font-size: 0.8rem; color: #999;">Trying standard resolution...</p>
+          </div>
+        `;
+        
+        // Fallback to standard resolution
+        setTimeout(() => {
+          modalImage.src = item.url;
+        }, 1000);
+      };
+      
+      // Start progress simulation
+      startProgress();
+    }
+  }
   
   // Close modal when clicking the X button
   closeBtn.addEventListener('click', closeModal);
@@ -435,6 +965,15 @@ function closeModal() {
     setTimeout(() => {
       modal.remove();
       document.removeEventListener('keydown', handleEscapeKey);
+      
+      // Clean up modal loading styles if no other modals are open
+      const remainingModals = document.querySelectorAll('.modal-overlay');
+      if (remainingModals.length === 0) {
+        const modalLoadingStyles = document.getElementById('modalLoadingStyles');
+        if (modalLoadingStyles) {
+          modalLoadingStyles.remove();
+        }
+      }
     }, 300);
   }
 }
