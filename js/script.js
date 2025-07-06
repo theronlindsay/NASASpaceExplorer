@@ -5,16 +5,14 @@ const getImagesButton = document.querySelector('button');
 const gallery = document.getElementById('gallery');
 
 // Call the setupDateInputs function from dateRange.js
-// This sets up the date pickers to:
-// - Default to a range of 9 days (from 9 days ago to today)
-// - Restrict dates to NASA's image archive (starting from 1995)
+// This sets up the date pickers with default values and limits
 setupDateInputs(startInput, endInput);
 
-// NASA APOD API endpoint (using DEMO_KEY for educational purposes)
+// NASA APOD API settings
 const NASA_API_KEY = 'ypmEV10SffRbJn46Cy7ZUWLZLLVrXgQhnNUtr1Kd';
 const NASA_APOD_URL = 'https://api.nasa.gov/planetary/apod';
 
-// Array of random space facts
+// Array of fun space facts to show users
 const SPACE_FACTS = [
   "A day on Venus is longer than its year! Venus rotates so slowly that one day lasts 243 Earth days, while one year lasts only 225 Earth days.",
   "Neutron stars are so dense that a teaspoon of neutron star material would weigh about 6 billion tons on Earth.",
@@ -33,218 +31,70 @@ const SPACE_FACTS = [
   "The International Space Station orbits Earth at a speed of about 17,500 mph, completing one orbit every 90 minutes."
 ];
 
-// Function to display a random space fact
+// Function to show a random space fact
 function displayRandomSpaceFact() {
+  // Pick a random fact from our array
   const randomIndex = Math.floor(Math.random() * SPACE_FACTS.length);
   const randomFact = SPACE_FACTS[randomIndex];
   
-  // Find or create the space fact container
-  let factContainer = document.getElementById('space-fact');
-  if (!factContainer) {
-    // Create the space fact section if it doesn't exist
-    const container = document.querySelector('.container');
-    const filters = document.querySelector('.filters');
-    
-    factContainer = document.createElement('div');
-    factContainer.id = 'space-fact';
-    factContainer.className = 'space-fact';
-    factContainer.innerHTML = `
-      <h3>🌟 Did You Know?</h3>
-      <p>${randomFact}</p>
-    `;
-    
-    // Insert the fact container between filters and gallery
-    container.insertBefore(factContainer, filters.nextSibling);
-  } else {
-    // Update existing fact
-    factContainer.querySelector('p').textContent = randomFact;
+  // Find the space fact elements on the page
+  const factContainer = document.getElementById('space-fact');
+  const factText = document.getElementById('space-fact-text');
+  
+  // Update the fact text and show it
+  if (factContainer && factText) {
+    factText.textContent = randomFact;
+    factContainer.style.display = 'block';
   }
 }
 
 // Display a random space fact when the page loads
 displayRandomSpaceFact();
 
-// Disable dark theme extensions and set iOS status bar color
-function setupThemeAndDisplay() {
+// Simple function to disable dark mode extensions
+function setupTheme() {
   // Disable dark mode extensions by setting color scheme to light
   document.documentElement.style.colorScheme = 'light only';
-  
-  // Add meta tag for iOS status bar color
-  const existingMeta = document.querySelector('meta[name="theme-color"]');
-  if (existingMeta) {
-    existingMeta.setAttribute('content', '#333333');
-  } else {
-    const metaTheme = document.createElement('meta');
-    metaTheme.name = 'theme-color';
-    metaTheme.content = '#333333';
-    document.head.appendChild(metaTheme);
-  }
-  
-  // Add meta tag for iOS status bar style
-  const existingStatusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-  if (existingStatusMeta) {
-    existingStatusMeta.setAttribute('content', 'default');
-  } else {
-    const metaStatus = document.createElement('meta');
-    metaStatus.name = 'apple-mobile-web-app-status-bar-style';
-    metaStatus.content = 'default';
-    document.head.appendChild(metaStatus);
-  }
-  
-  // Add viewport meta with viewport-fit for iOS notch handling
-  const existingViewport = document.querySelector('meta[name="viewport"]');
-  if (existingViewport) {
-    const currentContent = existingViewport.getAttribute('content');
-    if (!currentContent.includes('viewport-fit')) {
-      existingViewport.setAttribute('content', currentContent + ', viewport-fit=cover');
-    }
-  }
-  
-  // Add CSS for iOS safe areas
-  const style = document.createElement('style');
-  style.textContent = `
-    @supports (padding: max(0px)) {
-      body {
-        padding-top: max(20px, env(safe-area-inset-top));
-        padding-left: max(20px, env(safe-area-inset-left));
-        padding-right: max(20px, env(safe-area-inset-right));
-        padding-bottom: max(20px, env(safe-area-inset-bottom));
-        background: #333 !important;
-      }
-      
-      body::before {
-        top: max(10px, calc(env(safe-area-inset-top) + 10px));
-        left: max(10px, calc(env(safe-area-inset-left) + 10px));
-        right: max(10px, calc(env(safe-area-inset-right) + 10px));
-        bottom: max(10px, calc(env(safe-area-inset-bottom) + 10px));
-      }
-    }
-    
-    /* iOS Safari date picker styling */
-    input[type="date"] {
-      -webkit-appearance: none !important;
-      appearance: none !important;
-      background: rgba(255, 255, 255, 0.08) !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
-      color: #e5e5e5 !important;
-      border-radius: 8px !important;
-      padding: 12px 16px !important;
-      font-family: Helvetica, Arial, sans-serif !important;
-      font-size: 16px !important;
-      font-weight: 500 !important;
-      line-height: 1.4 !important;
-      width: 100% !important;
-      transition: all 0.2s ease !important;
-      position: relative !important;
-    }
-    
-    input[type="date"]:focus {
-      background: rgba(255, 255, 255, 0.12) !important;
-      border-color: rgba(255, 255, 255, 0.25) !important;
-      outline: none !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit {
-      color: #e5e5e5 !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-      color: #e5e5e5 !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit-text {
-      color: #e5e5e5 !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit-month-field {
-      color: #e5e5e5 !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit-day-field {
-      color: #e5e5e5 !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit-year-field {
-      color: #e5e5e5 !important;
-    }
-    
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      background: transparent !important;
-      color: #e5e5e5 !important;
-      opacity: 0.8 !important;
-      cursor: pointer !important;
-      filter: invert(1) !important;
-    }
-    
-    input[type="date"]::-webkit-calendar-picker-indicator:hover {
-      opacity: 1 !important;
-    }
-    
-    /* Force light theme for date picker popup on iOS */
-    input[type="date"]::-webkit-date-and-time-value {
-      color: #e5e5e5 !important;
-    }
-    
-    /* Dark theme scrollbars for all browsers */
-    /* Firefox */
-    * {
-      scrollbar-width: thin !important;
-      scrollbar-color: #555 #2a2a2a !important;
-    }
-    
-    /* WebKit browsers (Chrome, Safari, Edge) */
-    ::-webkit-scrollbar {
-      width: 8px !important;
-      height: 8px !important;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: #2a2a2a !important;
-      border-radius: 4px !important;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: #555 !important;
-      border-radius: 4px !important;
-      border: 1px solid #333 !important;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: #666 !important;
-    }
-    
-    ::-webkit-scrollbar-thumb:active {
-      background: #777 !important;
-    }
-    
-    /* Corner where scrollbars meet */
-    ::-webkit-scrollbar-corner {
-      background: #2a2a2a !important;
-    }
-    
-    /* Modal specific scrollbars */
-    .modal-content ::-webkit-scrollbar {
-      width: 6px !important;
-    }
-    
-    .modal-content ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.3) !important;
-      border: none !important;
-    }
-    
-    .modal-content ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.4) !important;
-    }
-    
-    .modal-content ::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
-  `;
-  document.head.appendChild(style);
 }
 
 // Call the setup function
-setupThemeAndDisplay();
+setupTheme();
+
+// Storage for preloaded images to make modals load faster
+const imagePreloadCache = new Map();
+
+// Function to preload an image in the background
+function preloadImage(url, hdUrl) {
+  // Use the high-resolution URL if available, otherwise use standard URL
+  const imageUrl = hdUrl || url;
+  
+  // Don't preload if already cached
+  if (imagePreloadCache.has(imageUrl)) {
+    return imagePreloadCache.get(imageUrl);
+  }
+  
+  // Create a promise that resolves when image is loaded
+  const preloadPromise = new Promise((resolve, reject) => {
+    const img = new Image();
+    
+    img.onload = () => {
+      console.log(`✅ Preloaded image: ${imageUrl}`);
+      resolve(img);
+    };
+    
+    img.onerror = () => {
+      console.warn(`❌ Failed to preload image: ${imageUrl}`);
+      reject(new Error(`Failed to preload ${imageUrl}`));
+    };
+    
+    // Start loading the image
+    img.src = imageUrl;
+  });
+  
+  // Cache the promise
+  imagePreloadCache.set(imageUrl, preloadPromise);
+  return preloadPromise;
+}
 
 // Function to extract YouTube video ID from URL
 function getYouTubeVideoId(url) {
@@ -283,124 +133,36 @@ async function fetchSpaceImages(startDate, endDate) {
   } catch (error) {
     // Show error message if something goes wrong
     console.error('Error fetching space images:', error);
-    gallery.innerHTML = `
-      <div class="placeholder">
-        <div class="placeholder-icon">❌</div>
-        <p>Sorry, we couldn't load the space images. Please try again.</p>
-      </div>
-    `;
     
-    // Remove loading progress styles if they exist
-    const loadingStyles = document.getElementById('loadingProgressStyles');
-    if (loadingStyles) {
-      loadingStyles.remove();
-    }
+    // Hide loading container and show error placeholder
+    const loadingContainer = document.getElementById('loading-container');
+    const errorPlaceholder = document.getElementById('error-placeholder');
+    
+    if (loadingContainer) loadingContainer.style.display = 'none';
+    if (errorPlaceholder) errorPlaceholder.style.display = 'block';
   }
 }
 
 // Function to show loading progress indicator
 function showLoadingProgress() {
-  gallery.innerHTML = `
-    <div class="loading-container">
-      <div class="loading-content">
-        <div class="loading-icon">🚀</div>
-        <h3>Loading Space Images...</h3>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
-        <p class="progress-text" id="progressText">Preparing to fetch images...</p>
-      </div>
-    </div>
-  `;
+  // Hide all other gallery states
+  const defaultPlaceholder = document.getElementById('default-placeholder');
+  const errorPlaceholder = document.getElementById('error-placeholder');
+  const noResultsPlaceholder = document.getElementById('no-results-placeholder');
+  const loadingContainer = document.getElementById('loading-container');
   
-  // Add loading progress styles
-  if (!document.getElementById('loadingProgressStyles')) {
-    const style = document.createElement('style');
-    style.id = 'loadingProgressStyles';
-    style.textContent = `
-      .loading-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 300px;
-        padding: 40px 20px;
-      }
-      
-      .loading-content {
-        text-align: center;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 40px 30px;
-        backdrop-filter: blur(10px);
-        max-width: 400px;
-        width: 100%;
-      }
-      
-      .loading-icon {
-        font-size: 3rem;
-        margin-bottom: 20px;
-        animation: rocket-pulse 2s ease-in-out infinite;
-      }
-      
-      @keyframes rocket-pulse {
-        0%, 100% { transform: scale(1) rotate(0deg); }
-        50% { transform: scale(1.1) rotate(5deg); }
-      }
-      
-      .loading-content h3 {
-        color: #e5e5e5;
-        font-family: Helvetica, Arial, sans-serif;
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin: 0 0 20px 0;
-      }
-      
-      .progress-bar {
-        width: 100%;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-        overflow: hidden;
-        margin: 20px 0;
-        position: relative;
-      }
-      
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #105bd8, #4a90e2);
-        border-radius: 4px;
-        width: 0%;
-        transition: width 0.3s ease;
-        position: relative;
-      }
-      
-      .progress-fill::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        animation: progress-shimmer 1.5s ease-in-out infinite;
-      }
-      
-      @keyframes progress-shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-      
-      .progress-text {
-        color: #b0b0b0;
-        font-family: Helvetica, Arial, sans-serif;
-        font-size: 0.9rem;
-        margin: 0;
-        font-weight: 400;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+  // Hide all placeholders
+  if (defaultPlaceholder) defaultPlaceholder.style.display = 'none';
+  if (errorPlaceholder) errorPlaceholder.style.display = 'none';
+  if (noResultsPlaceholder) noResultsPlaceholder.style.display = 'none';
+  
+  // Show loading container
+  if (loadingContainer) loadingContainer.style.display = 'flex';
+  
+  // Clear any existing image cards from gallery
+  const gallery = document.getElementById('gallery');
+  const imageCards = gallery.querySelectorAll('.image-card');
+  imageCards.forEach(card => card.remove());
 }
 
 // Function to update loading progress
@@ -420,25 +182,20 @@ async function displayImagesWithProgress(images) {
   // Update progress for API fetch completion
   updateLoadingProgress(1, 3, 'Images fetched successfully! Preparing gallery...');
   
-  // Clear the gallery
-  gallery.innerHTML = '';
+  // Hide loading container and show gallery content
+  const loadingContainer = document.getElementById('loading-container');
+  const gallery = document.getElementById('gallery');
   
-  // If no images found, show a message
+  // If no images found, show the no results placeholder
   if (!images || images.length === 0) {
-    gallery.innerHTML = `
-      <div class="placeholder">
-        <div class="placeholder-icon">🌌</div>
-        <p>No images found for this date range.</p>
-      </div>
-    `;
+    if (loadingContainer) loadingContainer.style.display = 'none';
+    const noResultsPlaceholder = document.getElementById('no-results-placeholder');
+    if (noResultsPlaceholder) noResultsPlaceholder.style.display = 'block';
     return;
   }
   
   // Update progress for starting image processing
   updateLoadingProgress(2, 3, 'Building image gallery...');
-  
-  // Don't create a temporary container, add cards directly to gallery
-  // This ensures the existing CSS grid layout works properly
   
   // Track loaded images for final progress
   let imagesLoaded = 0;
@@ -446,6 +203,15 @@ async function displayImagesWithProgress(images) {
   
   // Create HTML for each image
   images.forEach((item, index) => {
+    // Start preloading high-resolution images immediately for faster modal loading
+    if (item.media_type === 'image') {
+      // Preload both standard and HD versions in the background
+      preloadImage(item.url, item.hdurl).catch(() => {
+        // If HD fails, ensure standard version is cached
+        preloadImage(item.url);
+      });
+    }
+    
     // Create a container for each space image
     const imageCard = document.createElement('div');
     imageCard.className = 'image-card';
@@ -501,8 +267,33 @@ async function displayImagesWithProgress(images) {
       showModal(item);
     });
     
-    // Add this image card directly to the gallery
+    // Add this image card to the gallery
     gallery.appendChild(imageCard);
+    
+    // Set up intersection observer for prioritized preloading of visible images
+    if (item.media_type === 'image') {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Image card is visible, prioritize preloading its high-res version
+            const imageUrl = item.hdurl || item.url;
+            if (!imagePreloadCache.has(imageUrl)) {
+              console.log(`🎯 Prioritizing preload for visible image: ${item.title}`);
+              preloadImage(item.url, item.hdurl);
+            }
+            // Stop observing once we've triggered preloading
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        // Start preloading when image is 50% visible
+        threshold: 0.5,
+        // Start preloading 100px before the image enters viewport
+        rootMargin: '100px'
+      });
+      
+      observer.observe(imageCard);
+    }
     
     // Handle animation for different media types
     if (item.media_type === 'image') {
@@ -541,363 +332,119 @@ async function displayImagesWithProgress(images) {
   // Update progress for final step
   updateLoadingProgress(3, 3, 'Gallery ready! Loading images...');
   
-  // Remove loading progress styles after a delay
+  // Hide loading container after a delay
   setTimeout(() => {
-    const loadingStyles = document.getElementById('loadingProgressStyles');
-    if (loadingStyles) {
-      loadingStyles.remove();
-    }
+    if (loadingContainer) loadingContainer.style.display = 'none';
   }, 1000);
-}
-
-// Function to display images in the gallery
-function displayImages(images) {
-  // Clear the gallery
-  gallery.innerHTML = '';
-  
-  // If no images found, show a message
-  if (!images || images.length === 0) {
-    gallery.innerHTML = `
-      <div class="placeholder">
-        <div class="placeholder-icon">🌌</div>
-        <p>No images found for this date range.</p>
-      </div>
-    `;
-    return;
-  }
-  
-  // Create HTML for each image
-  images.forEach(item => {
-    // Create a container for each space image
-    const imageCard = document.createElement('div');
-    imageCard.className = 'image-card';
-    
-    // Build the HTML content for this image
-    let imageHtml = '';
-    
-    // Check if this is an image or video
-    if (item.media_type === 'image') {
-      imageHtml = `<img src="${item.url}" alt="${item.title}" loading="lazy">`;
-    } else if (item.media_type === 'video') {
-      // Check if it's a YouTube video and embed it
-      const youtubeId = getYouTubeVideoId(item.url);
-      if (youtubeId) {
-        imageHtml = `
-          <div class="video-embed">
-            <iframe 
-              src="https://www.youtube.com/embed/${youtubeId}" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowfullscreen
-              title="${item.title}">
-            </iframe>
-          </div>
-        `;
-      } else {
-        // Fallback for non-YouTube videos
-        imageHtml = `
-          <div class="video-placeholder">
-            <div class="video-icon">🎥</div>
-            <p><strong>Video Content</strong></p>
-            <a href="${item.url}" target="_blank" class="video-link">Watch Video</a>
-          </div>
-        `;
-      }
-    }
-    
-    // Set the complete HTML for this image card
-    imageCard.innerHTML = `
-      <div class="image-container">
-        ${imageHtml}
-      </div>
-      <div class="card-info">
-        <h3 class="card-title">${item.title}</h3>
-        <p class="card-date">${item.date}</p>
-      </div>
-    `;
-    
-    // Add click event to the entire card to show modal
-    imageCard.addEventListener('click', () => {
-      showModal(item);
-    });
-    
-    // Add this image card to our gallery
-    gallery.appendChild(imageCard);
-  });
 }
 
 // Function to show modal with image details
 function showModal(item) {
-  // Create modal HTML
-  const modalHtml = `
-    <div class="modal-overlay" id="imageModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>${item.title}</h2>
-          <span class="close-modal" title="Close">&times;</span>
-        </div>
-        <div class="modal-body">
-          <div class="modal-image">
-            ${item.media_type === 'image' 
-              ? `<div class="modal-image-container">
-                   <div class="modal-image-loading" id="modalImageLoading">
-                     <div class="modal-loading-content">
-                       <div class="modal-loading-icon">🖼️</div>
-                       <p>Loading high-resolution image...</p>
-                       <div class="modal-progress-bar">
-                         <div class="modal-progress-fill" id="modalProgressFill"></div>
-                       </div>
-                     </div>
-                   </div>
-                   <img src="${item.hdurl || item.url}" alt="${item.title}" loading="lazy" id="modalImage" style="display: none;">
-                 </div>`
-              : item.media_type === 'video' && getYouTubeVideoId(item.url)
-              ? `<div class="video-container">
-                   <iframe src="https://www.youtube.com/embed/${getYouTubeVideoId(item.url)}" 
-                           frameborder="0" 
-                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                           allowfullscreen
-                           title="${item.title}">
-                   </iframe>
-                 </div>`
-              : `<div class="video-container">
-                   <p><strong>Video Content</strong></p>
-                   <a href="${item.url}" target="_blank" class="video-link">Watch Video</a>
-                 </div>`
-            }
-          </div>
-          <div class="modal-info">
-            <p class="modal-date"><strong>Date:</strong> ${item.date}</p>
-            <p class="modal-explanation">${item.explanation}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Add modal to the page
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  
-  // Add modal image loading styles
-  if (!document.getElementById('modalLoadingStyles')) {
-    const style = document.createElement('style');
-    style.id = 'modalLoadingStyles';
-    style.textContent = `
-      .modal-image-container {
-        position: relative;
-        width: 100%;
-        min-height: 300px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 12px;
-        overflow: hidden;
-      }
-      
-      .modal-image-loading {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        z-index: 2;
-        transition: opacity 0.3s ease;
-      }
-      
-      .modal-loading-content {
-        text-align: center;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        backdrop-filter: blur(15px);
-        max-width: 300px;
-        width: 90%;
-      }
-      
-      .modal-loading-icon {
-        font-size: 2.5rem;
-        margin-bottom: 15px;
-        animation: modal-image-pulse 1.5s ease-in-out infinite;
-      }
-      
-      @keyframes modal-image-pulse {
-        0%, 100% { transform: scale(1); opacity: 0.8; }
-        50% { transform: scale(1.05); opacity: 1; }
-      }
-      
-      .modal-loading-content p {
-        color: #e5e5e5;
-        font-family: Helvetica, Arial, sans-serif;
-        font-size: 1rem;
-        font-weight: 500;
-        margin: 0 0 15px 0;
-      }
-      
-      .modal-progress-bar {
-        width: 100%;
-        height: 6px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 3px;
-        overflow: hidden;
-        position: relative;
-      }
-      
-      .modal-progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #105bd8, #4a90e2);
-        border-radius: 3px;
-        width: 0%;
-        transition: width 0.2s ease;
-        position: relative;
-      }
-      
-      .modal-progress-fill::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-        animation: modal-progress-shimmer 1.2s ease-in-out infinite;
-      }
-      
-      @keyframes modal-progress-shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-      
-      .modal-image-container img {
-        max-width: 100%;
-        max-height: 70vh;
-        object-fit: contain;
-        border-radius: 8px;
-        transition: opacity 0.5s ease;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  
-  // Get modal elements
+  // Get the modal and its elements
   const modal = document.getElementById('imageModal');
-  const closeBtn = modal.querySelector('.close-modal');
-  const modalContent = modal.querySelector('.modal-content');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDate = document.getElementById('modal-date');
+  const modalExplanation = document.getElementById('modal-explanation');
   
-  // Handle image loading for modal images
-  const modalImage = document.getElementById('modalImage');
-  const modalImageLoading = document.getElementById('modalImageLoading');
-  const modalProgressFill = document.getElementById('modalProgressFill');
+  // Update modal content
+  modalTitle.textContent = item.title;
+  modalDate.textContent = item.date;
+  modalExplanation.textContent = item.explanation;
   
-  if (modalImage && modalImageLoading && modalProgressFill) {
-    let progress = 0;
-    let progressInterval;
-    let hasLoaded = false;
-    let progressCompleted = false;
+  // Hide all media containers first
+  const imageContainer = document.getElementById('modal-image-container');
+  const youtubeContainer = document.getElementById('modal-video-youtube');
+  const otherVideoContainer = document.getElementById('modal-video-other');
+  
+  imageContainer.style.display = 'none';
+  youtubeContainer.style.display = 'none';
+  otherVideoContainer.style.display = 'none';
+  
+  // Show appropriate media content
+  if (item.media_type === 'image') {
+    // Show image container
+    imageContainer.style.display = 'flex';
     
-    // Simulate progress during image loading - complete independently
-    const startProgress = () => {
-      progressInterval = setInterval(() => {
-        if (progress < 100) {
-          // Slow down as we approach 100%
-          const increment = progress > 90 ? Math.random() * 2 + 1 : Math.random() * 8 + 3;
-          progress += increment;
-          progress = Math.min(progress, 100);
-          modalProgressFill.style.width = `${progress}%`;
-          
-          // Mark progress as completed when we reach 100%
-          if (progress >= 100 && !progressCompleted) {
-            progressCompleted = true;
-            clearInterval(progressInterval);
+    const modalImage = document.getElementById('modalImage');
+    const modalImageLoading = document.getElementById('modalImageLoading');
+    const modalProgressFill = document.getElementById('modalProgressFill');
+    
+    // Reset image state
+    modalImage.style.display = 'none';
+    modalImage.style.opacity = '1';
+    modalImageLoading.style.display = 'flex';
+    modalImageLoading.style.opacity = '1';
+    modalProgressFill.style.width = '0%';
+    
+    // Determine which image URL to use (HD if available)
+    const imageUrl = item.hdurl || item.url;
+    
+    // Check if image is already preloaded in our cache
+    const preloadedPromise = imagePreloadCache.get(imageUrl);
+    
+    if (preloadedPromise) {
+      // Image is preloaded! Show it immediately with fast animation
+      console.log('🚀 Using preloaded image for instant loading');
+      
+      preloadedPromise.then((preloadedImg) => {
+        // Fast progress animation for preloaded images
+        let progress = 0;
+        const fastProgress = setInterval(() => {
+          progress += 25; // Much faster increments
+          modalProgressFill.style.width = `${Math.min(progress, 100)}%`;
+          if (progress >= 100) {
+            clearInterval(fastProgress);
             
-            // If image is already loaded or we've waited enough, complete immediately
-            if (hasLoaded || modalImage.complete) {
-              setTimeout(completeLoading, 200);
-            } else {
-              // Wait a bit more for image, but not too long
+            // Show the image immediately
+            setTimeout(() => {
+              modalImage.src = imageUrl;
+              modalImage.alt = item.title;
+              
+              modalImageLoading.style.opacity = '0';
+              modalImage.style.display = 'block';
+              modalImage.style.opacity = '1';
+              
               setTimeout(() => {
-                if (!hasLoaded) {
-                  completeLoading();
-                }
-              }, 1500);
-            }
+                modalImageLoading.style.display = 'none';
+              }, 300);
+            }, 100);
           }
-        }
-      }, 120);
-    };
-    
-    // Function to complete loading animation
-    const completeLoading = () => {
-      if (hasLoaded) return;
-      hasLoaded = true;
-      
-      clearInterval(progressInterval);
-      modalProgressFill.style.width = '100%';
-      
-      setTimeout(() => {
-        modalImageLoading.style.opacity = '0';
-        modalImage.style.display = 'block';
-        modalImage.style.opacity = '1';
+        }, 40); // Very fast animation
         
-        setTimeout(() => {
-          if (modalImageLoading) {
-            modalImageLoading.style.display = 'none';
-          }
-        }, 300);
-      }, 100);
-    };
-    
-    // Check if image is already loaded (cached)
-    if (modalImage.complete && modalImage.naturalHeight !== 0) {
-      // For cached images, simulate quick loading
-      const quickProgress = setInterval(() => {
-        progress += 15;
-        modalProgressFill.style.width = `${Math.min(progress, 100)}%`;
-        if (progress >= 100) {
-          clearInterval(quickProgress);
-          setTimeout(completeLoading, 300);
-        }
-      }, 50);
+      }).catch(() => {
+        // Fallback to normal loading if preloaded image failed
+        loadImageWithProgress(modalImage, modalImageLoading, modalProgressFill, item);
+      });
     } else {
-      // Handle image load success - speed up completion if needed
-      modalImage.onload = () => {
-        if (progressCompleted && !hasLoaded) {
-          completeLoading();
-        }
-      };
-      
-      // Handle image load error
-      modalImage.onerror = () => {
-        clearInterval(progressInterval);
-        modalImageLoading.innerHTML = `
-          <div class="modal-loading-content">
-            <div class="modal-loading-icon">❌</div>
-            <p>Failed to load high-resolution image</p>
-            <p style="font-size: 0.8rem; color: #999;">Trying standard resolution...</p>
-          </div>
-        `;
-        
-        // Fallback to standard resolution
-        setTimeout(() => {
-          modalImage.src = item.url;
-        }, 1000);
-      };
-      
-      // Start progress simulation
-      startProgress();
+      // Image not preloaded, load with progress animation
+      loadImageWithProgress(modalImage, modalImageLoading, modalProgressFill, item);
+    }
+    
+  } else if (item.media_type === 'video') {
+    const youtubeId = getYouTubeVideoId(item.url);
+    
+    if (youtubeId) {
+      // Show YouTube container
+      youtubeContainer.style.display = 'block';
+      const iframe = document.getElementById('modal-youtube-iframe');
+      iframe.src = `https://www.youtube.com/embed/${youtubeId}`;
+      iframe.title = item.title;
+    } else {
+      // Show other video container
+      otherVideoContainer.style.display = 'block';
+      const videoLink = document.getElementById('modal-video-link');
+      videoLink.href = item.url;
     }
   }
+  
+  // Set up modal close handlers
+  const closeBtn = modal.querySelector('.close-modal');
+  const modalContent = modal.querySelector('.modal-content');
   
   // Close modal when clicking the X button
   closeBtn.addEventListener('click', closeModal);
   
-  // Close modal when clicking outside the content (on the overlay itself)
+  // Close modal when clicking outside the content
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       closeModal();
@@ -913,38 +460,30 @@ function showModal(item) {
   let startedFromTop = false;
   let startedFromLeftEdge = false;
   
-  // Track touch start position
   modal.addEventListener('touchstart', (e) => {
     startY = e.touches[0].clientY;
     startX = e.touches[0].clientX;
     
-    // Check if the touch started from the top 20% of the modal
     const modalRect = modalContent.getBoundingClientRect();
     const touchRelativeY = startY - modalRect.top;
     const modalHeight = modalRect.height;
     startedFromTop = touchRelativeY <= modalHeight * 0.2;
-    
-    // Check if the touch started from the left edge of the screen (within 30px)
     startedFromLeftEdge = startX <= 30;
   });
   
-  // Handle touch end - check for swipe gesture
   modal.addEventListener('touchend', (e) => {
     const endY = e.changedTouches[0].clientY;
     const endX = e.changedTouches[0].clientX;
     const deltaY = startY - endY;
-    const deltaX = endX - startX; // Positive for right swipe, negative for left
+    const deltaX = endX - startX;
     const absDeltaX = Math.abs(deltaX);
     const absDeltaY = Math.abs(deltaY);
     
-    // Check for downward swipe from top (existing functionality)
     if (startedFromTop && deltaY < -100 && absDeltaX < 50) {
       closeModal();
       return;
     }
     
-    // Check for right swipe from left edge
-    // Must start from left edge, swipe right at least 100px, and be primarily horizontal
     if (startedFromLeftEdge && deltaX > 100 && absDeltaY < 50) {
       closeModal();
     }
@@ -963,16 +502,20 @@ function closeModal() {
   if (modal) {
     modal.classList.remove('show');
     setTimeout(() => {
-      modal.remove();
+      modal.style.display = 'none';
       document.removeEventListener('keydown', handleEscapeKey);
       
-      // Clean up modal loading styles if no other modals are open
-      const remainingModals = document.querySelectorAll('.modal-overlay');
-      if (remainingModals.length === 0) {
-        const modalLoadingStyles = document.getElementById('modalLoadingStyles');
-        if (modalLoadingStyles) {
-          modalLoadingStyles.remove();
-        }
+      // Reset modal content for next use
+      const modalImage = document.getElementById('modalImage');
+      const youtubeIframe = document.getElementById('modal-youtube-iframe');
+      
+      if (modalImage) {
+        modalImage.src = '';
+        modalImage.style.display = 'none';
+      }
+      
+      if (youtubeIframe) {
+        youtubeIframe.src = '';
       }
     }, 300);
   }
@@ -982,6 +525,100 @@ function closeModal() {
 function handleEscapeKey(e) {
   if (e.key === 'Escape') {
     closeModal();
+  }
+}
+
+// Helper function to load image with progress animation (fallback for non-preloaded images)
+function loadImageWithProgress(modalImage, modalImageLoading, modalProgressFill, item) {
+  // Set image source
+  modalImage.src = item.hdurl || item.url;
+  modalImage.alt = item.title;
+  
+  // Handle image loading with progress simulation
+  let progress = 0;
+  let progressInterval;
+  let hasLoaded = false;
+  let progressCompleted = false;
+  
+  // Simulate progress during image loading
+  const startProgress = () => {
+    progressInterval = setInterval(() => {
+      if (progress < 100) {
+        const increment = progress > 90 ? Math.random() * 2 + 1 : Math.random() * 8 + 3;
+        progress += increment;
+        progress = Math.min(progress, 100);
+        modalProgressFill.style.width = `${progress}%`;
+        
+        if (progress >= 100 && !progressCompleted) {
+          progressCompleted = true;
+          clearInterval(progressInterval);
+          
+          if (hasLoaded || modalImage.complete) {
+            setTimeout(completeLoading, 200);
+          } else {
+            setTimeout(() => {
+              if (!hasLoaded) {
+                completeLoading();
+              }
+            }, 1500);
+          }
+        }
+      }
+    }, 120);
+  };
+  
+  // Function to complete loading animation
+  const completeLoading = () => {
+    if (hasLoaded) return;
+    hasLoaded = true;
+    
+    clearInterval(progressInterval);
+    modalProgressFill.style.width = '100%';
+    
+    setTimeout(() => {
+      modalImageLoading.style.opacity = '0';
+      modalImage.style.display = 'block';
+      modalImage.style.opacity = '1';
+      
+      setTimeout(() => {
+        modalImageLoading.style.display = 'none';
+      }, 300);
+    }, 100);
+  };
+  
+  // Check if image is already cached in browser
+  if (modalImage.complete && modalImage.naturalHeight !== 0) {
+    const quickProgress = setInterval(() => {
+      progress += 15;
+      modalProgressFill.style.width = `${Math.min(progress, 100)}%`;
+      if (progress >= 100) {
+        clearInterval(quickProgress);
+        setTimeout(completeLoading, 300);
+      }
+    }, 50);
+  } else {
+    modalImage.onload = () => {
+      if (progressCompleted && !hasLoaded) {
+        completeLoading();
+      }
+    };
+    
+    modalImage.onerror = () => {
+      clearInterval(progressInterval);
+      modalImageLoading.innerHTML = `
+        <div class="modal-loading-content">
+          <div class="modal-loading-icon">❌</div>
+          <p>Failed to load high-resolution image</p>
+          <p style="font-size: 0.8rem; color: #999;">Trying standard resolution...</p>
+        </div>
+      `;
+      
+      setTimeout(() => {
+        modalImage.src = item.url;
+      }, 1000);
+    };
+    
+    startProgress();
   }
 }
 

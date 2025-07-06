@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#333333" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>NASA Space Explorer</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+  
+  <!-- Main styles for all devices -->
+  <link href="css/style.css" rel="stylesheet" type="text/css" />
+  
+  <!-- iOS and mobile device specific styles -->
+  <link href="css/ios.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
   <div class="container">
@@ -14,15 +21,106 @@
     </header>
 
     <div class="filters">
-      <input type="date" id="startDate" />
-      <input type="date" id="endDate" />
-      <button>Get Space Images</button>
+      <div class="instructions">
+        <h3>🌌 Explore NASA's Astronomy Picture of the Day</h3>
+        <p>Select a date range to discover amazing space images and videos from NASA's archive!</p>
+      </div>
+      
+      <div class="date-inputs">
+        <div class="input-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" id="startDate" />
+        </div>
+        
+        <div class="input-group">
+          <label for="endDate">End Date:</label>
+          <input type="date" id="endDate" />
+        </div>
+      </div>
+      
+      <button>🚀 Get Space Images</button>
+    </div>
+
+    <!-- Space fact section (hidden by default, shown by JavaScript) -->
+    <div id="space-fact" class="space-fact" style="display: none;">
+      <h3>🌟 Did You Know?</h3>
+      <p id="space-fact-text"></p>
     </div>
 
     <div id="gallery" class="gallery">
-      <div class="placeholder">
+      <!-- Default placeholder -->
+      <div id="default-placeholder" class="placeholder">
         <div class="placeholder-icon">🔭</div>
         <p>Select a date range and click "Get Space Images" to explore the cosmos!</p>
+      </div>
+
+      <!-- Loading indicator (hidden by default) -->
+      <div id="loading-container" class="loading-container" style="display: none;">
+        <div class="loading-content">
+          <div class="loading-icon">🚀</div>
+          <h3>Loading Space Images...</h3>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <p class="progress-text" id="progressText">Preparing to fetch images...</p>
+        </div>
+      </div>
+
+      <!-- Error placeholder (hidden by default) -->
+      <div id="error-placeholder" class="placeholder" style="display: none;">
+        <div class="placeholder-icon">❌</div>
+        <p>Sorry, we couldn't load the space images. Please try again.</p>
+      </div>
+
+      <!-- No results placeholder (hidden by default) -->
+      <div id="no-results-placeholder" class="placeholder" style="display: none;">
+        <div class="placeholder-icon">🌌</div>
+        <p>No images found for this date range.</p>
+      </div>
+    </div>
+
+    <!-- Modal structure (hidden by default) -->
+    <div id="imageModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-title"></h2>
+          <span class="close-modal" title="Close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="modal-image">
+            <!-- For images -->
+            <div id="modal-image-container" class="modal-image-container" style="display: none;">
+              <div class="modal-image-loading" id="modalImageLoading">
+                <div class="modal-loading-content">
+                  <div class="modal-loading-icon">🖼️</div>
+                  <p>Loading high-resolution image...</p>
+                  <div class="modal-progress-bar">
+                    <div class="modal-progress-fill" id="modalProgressFill"></div>
+                  </div>
+                </div>
+              </div>
+              <img id="modalImage" alt="" loading="lazy" style="display: none;">
+            </div>
+            
+            <!-- For YouTube videos -->
+            <div id="modal-video-youtube" class="video-container" style="display: none;">
+              <iframe id="modal-youtube-iframe" frameborder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowfullscreen>
+              </iframe>
+            </div>
+            
+            <!-- For other videos -->
+            <div id="modal-video-other" class="video-container" style="display: none;">
+              <p><strong>Video Content</strong></p>
+              <a id="modal-video-link" href="#" target="_blank" class="video-link">Watch Video</a>
+            </div>
+          </div>
+          <div class="modal-info">
+            <p class="modal-date"><strong>Date:</strong> <span id="modal-date"></span></p>
+            <p class="modal-explanation" id="modal-explanation"></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

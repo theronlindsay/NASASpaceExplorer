@@ -101,14 +101,55 @@ h1 {
 .filters {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
   justify-content: center;
   margin-bottom: 30px;
-  padding: 20px;
+  padding: 30px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Instructions section styling */
+.instructions {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.instructions h3 {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.instructions p {
+  color: #b0b0b0;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Date inputs container */
+.date-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual input group styling */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  color: #e5e5e5;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
 }
 
 /* Inputs and buttons - Arc style */
@@ -153,8 +194,16 @@ button:hover {
 /* Stack horizontally on wider screens */
 @media (min-width: 600px) {
   .filters {
+    padding: 35px;
+  }
+  
+  .date-inputs {
     flex-direction: row;
-    padding: 20px;
+    gap: 20px;
+  }
+  
+  .input-group {
+    flex: 1;
   }
   
   input[type="date"],
@@ -210,9 +259,9 @@ button:hover {
 }
 
 .image-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 /* Container for image and info icon */
@@ -253,7 +302,7 @@ button:hover {
   }
 }
 
-/* Image styles within cards - Arc style with hover zoom */
+/* Image styles within cards - Arc style with subtle hover effect */
 .image-card img {
   width: 100%;
   height: 240px;
@@ -263,7 +312,7 @@ button:hover {
 }
 
 .image-card:hover img {
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 /* Video embed styling - Arc style */
@@ -384,7 +433,7 @@ button:hover {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  max-width: 900px;
+  max-width: 1200px; /* Increased for side-by-side layout */
   max-height: 90vh;
   width: 90%;
   overflow: hidden;
@@ -439,28 +488,53 @@ button:hover {
 
 .modal-body {
   padding: 24px;
-  max-height: calc(90vh - 120px);
+  max-height: calc(90vh - 140px); /* Increased to account for header and border */
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Desktop side-by-side layout */
+@media (min-width: 768px) {
+  .modal-body {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  
+  .modal-image {
+    flex: 0 0 55%; /* Take up 55% of the width */
+    margin-bottom: 0;
+    margin-right: 24px;
+  }
+  
+  .modal-info {
+    flex: 1; /* Take remaining space */
+    min-width: 0; /* Allow text to wrap properly */
+  }
 }
 
 .modal-image {
-  margin-bottom: 24px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Ensure full width */
+  /* Let the image determine the height naturally */
 }
 
 .modal-image img {
   max-width: 100%;
-  max-height: 450px;
   object-fit: contain;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  display: block; /* Ensure proper display type */
 }
 
 .video-container {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 350px; /* Adjusted for side-by-side layout */
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -468,6 +542,13 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Desktop adjustments for video containers */
+@media (min-width: 768px) {
+  .video-container {
+    height: 280px; /* Smaller height for side-by-side */
+  }
 }
 
 .video-container iframe {
@@ -515,14 +596,15 @@ button:hover {
   font-size: 16px;
   color: #e5e5e5;
   line-height: 1.7;
-  text-align: justify;
+  text-align: left; /* Changed from justify for better readability */
 }
 
 /* Mobile responsiveness for modal */
-@media (max-width: 600px) {
+@media (max-width: 767px) {
   .modal-content {
     width: 95%;
     max-height: 95vh;
+    max-width: 500px; /* Smaller max-width on mobile */
   }
   
   .modal-header h2 {
@@ -531,6 +613,12 @@ button:hover {
   
   .modal-body {
     padding: 15px;
+    flex-direction: column; /* Ensure stacked on mobile */
+  }
+  
+  .modal-image {
+    margin-right: 0;
+    margin-bottom: 20px;
   }
   
   .modal-image img {
@@ -540,4 +628,187 @@ button:hover {
   .video-container {
     height: 250px;
   }
+}
+
+/* Loading progress styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: 40px 20px;
+}
+
+.loading-content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 40px 30px;
+  backdrop-filter: blur(10px);
+  max-width: 400px;
+  width: 100%;
+}
+
+.loading-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  animation: rocket-pulse 2s ease-in-out infinite;
+}
+
+@keyframes rocket-pulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+}
+
+.loading-content h3 {
+  color: #e5e5e5;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 20px 0;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #105bd8, #4a90e2);
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progress-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-text {
+  color: #b0b0b0;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.9rem;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Modal image loading styles */
+.modal-image-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  text-align: center; /* Ensure any inline content is centered */
+  margin: 1em 0; /* Add some margin for spacing */
+}
+
+.modal-image-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.modal-loading-content {
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(15px);
+  max-width: 300px;
+  width: 90%;
+}
+
+.modal-loading-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  animation: modal-image-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes modal-image-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+.modal-loading-content p {
+  color: #e5e5e5;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 15px 0;
+}
+
+.modal-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.modal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #105bd8, #4a90e2);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.2s ease;
+  position: relative;
+}
+
+.modal-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: modal-progress-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes modal-progress-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.modal-image-container img {
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  transition: opacity 0.5s ease;
+  display: block;
+  /* Flexbox parent will handle centering */
 }
