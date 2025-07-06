@@ -9,7 +9,7 @@ const gallery = document.getElementById('gallery');
 setupDateInputs(startInput, endInput);
 
 // NASA APOD API settings
-const NASA_API_KEY = '';
+const NASA_API_KEY = 'ypmEV10SffRbJn46Cy7ZUWLZLLVrXgQhnNUtr1Kd';
 const NASA_APOD_URL = 'https://api.nasa.gov/planetary/apod';
 
 // Array of fun space facts to show users
